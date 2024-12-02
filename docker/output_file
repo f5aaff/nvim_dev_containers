@@ -1,6 +1,0 @@
-[?1049h[?1h[H[2J[?2004h[?2026$p[?2048$p[?2027$p[?u[c[?12h[?25hError executing lua: Vim:Error invoking 'nvim_command' on channel 3:
-Invalid channel: 3
-stack traceback:
-	[C]: in function 'rpcrequest'
-	vim/_editor.lua: in function <vim/_editor.lua:0>
-[?25l[23B(B[m[?12h[?25h[?1l[?2048l[?2004l[?1004l[?12h[?25h[2mNov 29 18:00:25.720[0m [31mERROR[0m Error: Process exited with error code 2

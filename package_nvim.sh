@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TMP_STORE="nvim_$(date +%d-%m-%y_%H-%M-%S)"
+TMP_STORE="nvim_deps"
 
 # traps interrupts so it cleans up after itself
 trap 'cleanup_and_exit' INT TERM KILL
@@ -139,4 +139,6 @@ chmod +x "$INSTALL_SCRIPT"
 printf "\e[32m archiving files... \n\e[0m"
 tar_with_progress $TMP_STORE.tar $TMP_STORE
 
+printf "\e[32m copying archive into docker context... \n\e[0m"
+pv $TMP_STORE.tar > ./docker/nvim_deps.tar
 rm -rf $TMP_STORE
