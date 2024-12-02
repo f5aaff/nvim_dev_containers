@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  neovim:
+    build: .
+    container_name: neovim_client
+    restart: unless-stopped
+    networks:
+      - nvim_stuff

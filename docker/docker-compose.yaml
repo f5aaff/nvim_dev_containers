@@ -1,0 +1,11 @@
+
+services:
+  neovim_server:
+    build: .
+    ports:
+      - "6666:6666"
+    container_name: neovim_headless
+    restart: unless-stopped
+    volumes:
+      - /home/f/.config/nvim/:/home/nvim_user/.config/nvim
+      - /home/f/.local/share/nvim/:/home/nvim_user/.local/share/nvim
