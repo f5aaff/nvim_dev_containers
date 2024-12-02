@@ -76,13 +76,13 @@ mkdir $TMP_STORE
 printf "\e[32m copying files... \n\e[0m"
 # copy the relevent nvim files from their respective locations, to locations in the install tarball
 copy_with_progress ~/.local/share/nvim/ $TMP_STORE/local_share
-printf "\e[32m copied ~/.local/share/nvim \n\e[0m"
+printf "\e[32m \tcopied ~/.local/share/nvim \n\e[0m"
 
 copy_with_progress ~/.config/nvim/ $TMP_STORE/config_nvim
-printf "\e[32m copied ~/.config/nvim \n\e[0m"
+printf "\e[32m \tcopied ~/.config/nvim \n\e[0m"
 
 copy_with_progress ~/.local/share/bob/ $TMP_STORE/local_share_bob
-printf "\e[32m copied ~/.local/share/bob/ \n\e[0m"
+printf "\e[32m \tcopied ~/.local/share/bob/ \n\e[0m"
 
 # export the function for find to use
 export -f convert_symlink_to_home_env
