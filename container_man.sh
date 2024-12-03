@@ -1,8 +1,12 @@
 #!/bin/bash
-source ./container_man.env
+ENV_PATH="$1"
+if [ -z $ENV_PATH ];then
+    ENV_PATH=./container_man.env
+fi
+source $ENV_PATH
 case "$1" in
 -h | --help)
-    echo "Usage:"
+    echo "Usage: $0 [-b|-s|-S|-c [path/to/.env](optional)]"
     echo "     [-h|--help] prints this message"
     echo "     [-b|--build] builds the container at the path given by DOCKER_PATH in the .env"
     echo "     [-s|--start] runs docker compose up on the container located under DOCKER_PATH"

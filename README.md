@@ -57,7 +57,7 @@ that can be connected to from the host machine, using built in nvim functionalit
 container_man is a fairly simple bash script, intended to wrap some of the basic functions of dev containers.
 
 ```
-Usage:
+Usage: ./container_man.sh [-b|-s|-S|-c [path/to/.env](optional)]
      [-h|--help] prints this message
      [-b|--build] builds the container at the path given by DOCKER_PATH in the .env
      [-s|--start] runs docker compose up on the container located under DOCKER_PATH
