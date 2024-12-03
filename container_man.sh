@@ -1,40 +1,72 @@
 #!/bin/bash
+source ./container_man.env
 case "$1" in
-  -h|--help)
+-h | --help)
     echo "Usage:"
-    echo "      [-h|--help] prints this message"
-    echo "      [-b|--build] builds the container located under ./docker"
-    echo "      [-s|--start] runs docker compose up on the container located under ./docker"
-    echo "      [-S|--stop] stops the container located under ./docker"
-    echo "      [-c|--connect] <container name> <port> attempts to connect an nvim instance to the given container, provided the details are correct"
+    echo "     [-h|--help] prints this message"
+    echo "     [-b|--build] builds the container at the path given by DOCKER_PATH in the .env"
+    echo "     [-s|--start] runs docker compose up on the container located under DOCKER_PATH"
+    echo "     [-S|--stop] stops the container located under DOCKER_PATH"
+    echo "     [-c|--connect] attempts to connect an nvim instance to the given container, provided the details are correct, taken from the .env as CONTAINER_NAME and PORT respectively."
     exit 0
     ;;
-  -b|--build)
-    ./package_nvim.sh
-    cd docker ; docker compose build
-    ;;
-  -s|--start)
-      cd docker ; docker compose up
-      ;;
-  -S|--stop)
-      cd docker ; docker compose down
-      ;;
-  -c|--connect)
-      CONTAINER_NAME=$2
-      PORT=$3
-      if [[ -z "$CONTAINER_NAME" ]]; then
-          printf "\e[31m please provide a container name, e.g nvim_headless\n\e[0m"
-          exit 1
-      fi
+-b | --build)
+    if [ "$OFFLINE" = true ]; then
+        CMD="./util/getBins.sh"
 
-      if [[ -z "$PORT" ]]; then
-          printf "\e[31m please provide a port, e.g 6666\n\e[0m"
-          exit 1
-      fi
-      SERVER=$(docker exec $CONTAINER_NAME hostname -i)
-      nvim --server $SERVER:$PORT --remote-ui
-      ;;
-  *)
+        if [ -n "$PACKAGES" ]; then
+            CMD="$CMD -i $PACKAGES"
+        fi
+
+        if [ -n "$PACKAGE_OUTPUT" ]; then
+            CMD="$CMD -o $PACKAGE_OUTPUT"
+        fi
+
+        # Execute the command
+        echo "Executing: $CMD"
+        $CMD
+    fi
+    CMD="./package_nvim.sh"
+    if [ -n "$DOCKER_PATH" ]; then
+        CMD="$CMD -d $DOCKER_PATH"
+    fi
+
+    $CMD
+
+    cd $DOCKER_PATH
+    docker compose build
+    ;;
+-s | --start)
+    if [ -z "$DOCKER_PATH" ]; then
+        DOCKER_PATH=./docker
+    fi
+    cd $DOCKER_PATH
+    docker compose up
+    cd -
+    ;;
+-S | --stop)
+    if [ -z "$DOCKER_PATH" ]; then
+        DOCKER_PATH=./docker
+    fi
+    cd $DOCKER_PATH
+
+    docker compose down
+
+    cd -
+    ;;
+-c | --connect)
+    if [[ -z "$CONTAINER_NAME" ]]; then
+        CONTAINER_NAME="neovim_headless"
+    fi
+
+    if [[ -z "$PORT" ]]; then
+        PORT=6666
+    fi
+    printf "\e[32m using $CONTAINER_NAME as the server with port $PORT...\n\e[0m"
+    SERVER=$(docker exec $CONTAINER_NAME hostname -i)
+    nvim --server $SERVER:$PORT --remote-ui
+    ;;
+*)
     echo "Invalid argument: $1" >&2
     $0 --help
     exit 1

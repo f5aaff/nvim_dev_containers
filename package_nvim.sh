@@ -1,6 +1,24 @@
 #!/bin/bash
 
 TMP_STORE="nvim_deps"
+DOCKER_PATH=./docker
+
+case "$1" in
+-h | --help)
+    echo "usage: $0 [-d /path/to/docker/files]"
+    echo "-d|--docker-path : path pointing to docker files, e.g ./docker."
+    exit 0
+    # Display help or perform related action
+    ;;
+-d | --docker-path)
+    if [ -n "$2" ] && [ "${2:0:1}" != "-" ]; then
+        DOCKER_PATH=$2
+        shift # Shift past the argument
+    else
+        DOCKER_PATH=./docker # Set DOCKER_PATH to an empty string if no argument is given
+    fi
+    ;;
+esac
 
 # traps interrupts so it cleans up after itself
 trap 'cleanup_and_exit' INT TERM KILL
@@ -165,5 +183,5 @@ printf "\e[32m archiving files... \n\e[0m"
 tar_with_progress $TMP_STORE.tar $TMP_STORE
 
 printf "\e[32m copying archive into docker context... \n\e[0m"
-pv $TMP_STORE.tar >./docker/nvim_deps.tar
+pv $TMP_STORE.tar >$DOCKER_PATH/nvim_deps.tar
 rm -rf $TMP_STORE

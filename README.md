@@ -52,3 +52,28 @@ that can be connected to from the host machine, using built in nvim functionalit
     ensuring the given port is the one you exposed previously.
 
 
+
+# container_man.sh
+container_man is a fairly simple bash script, intended to wrap some of the basic functions of dev containers.
+
+```
+Usage:
+     [-h|--help] prints this message
+     [-b|--build] builds the container at the path given by DOCKER_PATH in the .env
+     [-s|--start] runs docker compose up on the container located under DOCKER_PATH
+     [-S|--stop] stops the container located under DOCKER_PATH
+     [-c|--connect] attempts to connect an nvim instance to the given container, provided the details are correct, taken from the .env as CONTAINER_NAME and PORT respectively.
+```
+- container_man goes off of the values presented in ./container_man.env. the defaults are listed in the file currently,
+but even if those values are removed, the defaults are within the script itself.
+## build
+- this will run ./package_nvim.sh, packaging up the local neovim configuration, and placing it in the given docker context.
+- if ```OFFLINE``` is set to true, it will also copy any local copies of the list of packages, given in ```PACKAGES``` to the path given by ```PACKAGE_OUTPUT```
+## start
+- all this does is run ```docker compose up &``` in the ```DOCKER_PATH``` variable.
+## stop
+- same as start, except with stop. runs ```docker compose down &```.
+## connect
+- this will grab the hostname from the container with the name given by ```CONTAINER_NAME```.
+- the port, is taken from the environment variables as well.
+- then, it will use that hostname, to run ```nvim --server <container_hostname>:<port> --remote-ui```.
