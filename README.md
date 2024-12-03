@@ -18,15 +18,15 @@ that can be connected to from the host machine, using built in nvim functionalit
         - ```./_pull_no_docker.sh /tmp/alpine_latest alpine:latest```.
 
     - then, run ```tar -cC '/tmp/alpine_latest' . | docker load``` to load your local docker image.
-    - this script is taken from (here)[https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh].
+    - this script is taken from [here](https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh).
 
 # installing nvim
 - install it via your distros package manager, e.g ```dnf install neovim```.
-- or, use (bob)[https://github.com/MordechaiHadad/bob] to install and manage nvim versions, as I have done.
+- or, use [bob](https://github.com/MordechaiHadad/bob) to install and manage nvim versions, as I have done.
 
 ## nvim plugins
 - I use packer to manage my plugins, hence the inclusion of ```~/.local/share/nvim``` in the packaging script. This may not work for other means of plugin management.
-- The instructions for installing packer can be found on the creators github, (here)[https://github.com/wbthomason/packer.nvim]
+- The instructions for installing packer can be found on the creators github, [here](https://github.com/wbthomason/packer.nvim)
 
 # creating the docker image
 - run ./package_nvim.sh, you need to include this in your docker container, to be opened and ran from inside.
