@@ -96,12 +96,18 @@ printf "\e[32m augmenting symlinks... \n\e[0m"
 # in the link, with a path containing the unexpanded $HOME var
 find "$TMP_STORE" -type l -exec bash -c 'convert_symlink_to_home_env "$0"' {} \;
 
+chmod ugo+rw $TMP_STORE
 # install script, not written since the packaging isn't done
 INSTALL_SCRIPT="$TMP_STORE/install_nvim.sh"
 
 # Use `cat` to write the content of the script into the file
 cat <<'EOF' >"$INSTALL_SCRIPT"
 #!/bin/bash
+
+TARGET_USER=$1
+if [[ -z "TARGET_USER" ]]; then
+    TARGET_USER=$USER
+fi
 
 copy_with_progress() {
     SOURCE=$1
@@ -121,14 +127,18 @@ if [[ -z "$(which tar)" ]]; then
     exit 1
 fi
 
-copy_with_progress ./local_share/nvim ~/.local/share/
+chmod -R ugo+rwx /nvim_deps
+chown -R /nvim_deps nvim_user
+copy_with_progress ./local_share/nvim /home/$TARGET_USER/.local/share/
 printf "\e[32m copied ~/.local/share/nvim \n\e[0m"
 
-copy_with_progress ./local_share_bob/bob ~/.local/share/
+copy_with_progress ./local_share_bob/bob /home/$TARGET_USER/.local/share/
 printf "\e[32m copied ~/.local/share/bob/ \n\e[0m"
 
-copy_with_progress ./config_nvim/nvim ~/.config/
+copy_with_progress ./config_nvim/nvim /home/$TARGET_USER/.config/
 printf "\e[32m copied ~/.config/nvim \n\e[0m"
+
+
 
 EOF
 

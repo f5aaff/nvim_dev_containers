@@ -15,6 +15,8 @@ RUN apk update && apk add --no-cache \
 
 COPY nvim_deps.tar /nvim.tar
 RUN tar -xvf /nvim.tar
+
+RUN cd nvim_deps && ./install_nvim.sh nvim_user
 # Expose the port for Neovim to listen on
 EXPOSE 6666
 RUN adduser -S nvim_user
@@ -22,7 +24,6 @@ USER nvim_user
 #RUN git clone --depth 1 https://github.com/wbthomason/packer.nvim\
 # ~/.local/share/nvim/site/pack/packer/start/packer.nvim
 
-RUN /nvim_deps/install_nvim.sh
 # Start Neovim in headless mode listening on the specified address
 CMD ["nvim", "--headless", "--listen", "0.0.0.0:6666"]
 
