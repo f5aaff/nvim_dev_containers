@@ -1,7 +1,12 @@
 #!/bin/bash
 case "$1" in
   -h|--help)
-    echo "Usage: $0 [-h|--help]"
+    echo "Usage:"
+    echo "      [-h|--help] prints this message"
+    echo "      [-b|--build] builds the container located under ./docker"
+    echo "      [-s|--start] runs docker compose up on the container located under ./docker"
+    echo "      [-S|--stop] stops the container located under ./docker"
+    echo "      [-c|--connect] <container name> <port> attempts to connect an nvim instance to the given container, provided the details are correct"
     exit 0
     ;;
   -b|--build)
@@ -31,6 +36,7 @@ case "$1" in
       ;;
   *)
     echo "Invalid argument: $1" >&2
+    $0 --help
     exit 1
     ;;
 esac
