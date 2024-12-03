@@ -14,10 +14,9 @@ that can be connected to from the host machine, using built in nvim functionalit
 - docker pull the image you want, I have included some basic docker files for debian, alpine and fedora.
 - or, use the _pull_no_docker.sh_ and specify a tag e.g ```alpine:latest``` and an output dir, e.g ```/tmp/alpine_latest```.
 
-the complete usage should be:
+    - the complete usage should be:
+        - ```./_pull_no_docker.sh /tmp/alpine_latest alpine:latest```.
 
-
-```./_pull_no_docker.sh /tmp/alpine_latest alpine:latest```.
     - then, run ```tar -cC '/tmp/alpine_latest' . | docker load``` to load your local docker image.
     - this script is taken from (here)[https://raw.githubusercontent.com/moby/moby/master/contrib/download-frozen-image-v2.sh].
 
