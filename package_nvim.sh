@@ -6,12 +6,11 @@ TMP_STORE="nvim_deps"
 trap 'cleanup_and_exit' INT TERM KILL
 
 function cleanup_and_exit() {
-  echo "Exiting..."
-  rm -rf $TMP_STORE >/dev/null
-  rm -rf $TMP_STORE.tar >/dev/null
-  exit 0
+    echo "Exiting..."
+    rm -rf $TMP_STORE >/dev/null
+    rm -rf $TMP_STORE.tar >/dev/null
+    exit 0
 }
-
 
 copy_with_progress() {
     SOURCE=$1
@@ -72,7 +71,6 @@ fi
 
 mkdir $TMP_STORE
 
-
 printf "\e[32m copying files... \n\e[0m"
 # copy the relevent nvim files from their respective locations, to locations in the install tarball
 copy_with_progress ~/.local/share/nvim/ $TMP_STORE/local_share
@@ -81,15 +79,30 @@ printf "\e[32m \tcopied ~/.local/share/nvim \n\e[0m"
 copy_with_progress ~/.config/nvim/ $TMP_STORE/config_nvim
 printf "\e[32m \tcopied ~/.config/nvim \n\e[0m"
 
-copy_with_progress ~/.local/share/bob/ $TMP_STORE/local_share_bob
-printf "\e[32m \tcopied ~/.local/share/bob/ \n\e[0m"
+if [[ -z "$(which bob)" ]]; then
+    printf "\e[31m bob not installed, looking for nvim locally...\n\e[0m"
+    if [[ -z "$(which nvim)" ]]; then
+        printf "\e [31m nvim not installed locally, please install nvim.\n\e[0m"
+        exit 1
+
+    else
+
+        printf "\e[32m nvim binary found locally, copying...\n\e[0m"
+        nvim_bin=$(which nvim)
+        cp nvim_bin $TMP_STORE/.local_share_bob/bob/nvim-bin/
+    fi
+else
+
+    copy_with_progress ~/.local/share/bob/ $TMP_STORE/local_share_bob
+    printf "\e[32m \tcopied ~/.local/share/bob/ \n\e[0m"
+
+fi
 
 # export the function for find to use
 export -f convert_symlink_to_home_env
 
 # Export the realpath utility (some systems may require this for compatibility)
 export PATH
-
 
 printf "\e[32m augmenting symlinks... \n\e[0m"
 # Recursively find all symlinks and process them, replacing the full PATH
@@ -145,10 +158,9 @@ EOF
 # Make the generated script executable
 chmod +x "$INSTALL_SCRIPT"
 
-
 printf "\e[32m archiving files... \n\e[0m"
 tar_with_progress $TMP_STORE.tar $TMP_STORE
 
 printf "\e[32m copying archive into docker context... \n\e[0m"
-pv $TMP_STORE.tar > ./docker/nvim_deps.tar
+pv $TMP_STORE.tar >./docker/nvim_deps.tar
 rm -rf $TMP_STORE
