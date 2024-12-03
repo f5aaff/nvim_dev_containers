@@ -1,0 +1,23 @@
+# Use Alpine as the base image
+FROM debian:bookworm
+
+# Install dependencies and Neovim
+RUN apt update && apt install --no-cache \
+    neovim \
+    curl \
+    git \
+    pv \
+    && rm -rf /var/cache/apk/*
+
+COPY nvim_deps.tar /nvim.tar
+RUN tar -xvf /nvim.tar
+
+RUN cd nvim_deps && ./install_nvim.sh nvim_user
+# Expose the port for Neovim to listen on
+EXPOSE 6666
+RUN adduser -S nvim_user
+USER nvim_user
+RUN export PATH=PATH:/home/nvim_user/.local/share/bob/nvim-bin/
+# Start Neovim in headless mode listening on the specified address
+CMD ["nvim", "--headless", "--listen", "0.0.0.0:6666"]
+

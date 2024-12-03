@@ -10,20 +10,19 @@ FROM fedora:42
 # create the user for the editor
 RUN adduser nvim_user
 
-# this step is only necessary if the container will be offline, otherwise,
-# use the package manager for the distro.
 # copy binaries
 COPY bins/ /usr/bin/
+
+# copy them again, to the home dir of the user
+COPY bins/ /home/nvim_user
 
 # ensure path is up to date
 RUN export PATH=$PATH:/usr/bin/
 
 # copy in the deps from the host
 COPY nvim_deps.tar /nvim.tar
-
 # extract the nvim deps
 RUN tar -xvf /nvim.tar
-
 # chmod all the bins, to make sure the editor user can access them
 RUN chmod -R 755 /usr/bin/
 
@@ -31,9 +30,13 @@ RUN chmod -R 755 /usr/bin/
 # install nvim for the editor user
 RUN cd nvim_deps && ./install_nvim.sh nvim_user
 
-# chown & chmod user home dir, since root modified the files
+# chmod user .local dir
 RUN chown -R nvim_user /home/nvim_user
 RUN chmod -R 755 /home/nvim_user
+RUN chmod -R 755 /home/nvim_user/.local
+
+# chmod user .config dir
+RUN chmod -R 755 /home/nvim_user/.config
 
 # Expose the port for Neovim to listen on
 EXPOSE 6666
@@ -43,7 +46,7 @@ USER nvim_user
 
 # update the users path var
 RUN export PATH=$PATH:/usr/bin/
-ENV PATH=$PATH:/home/nvim_user/.local/share/bob/nightly/bin/
+RUN export PATH=$PATH:/home/nvim_user/.local/share/bob/nightly/bin/
 ## Start Neovim in headless mode listening on the specified address
-CMD ["nvim", "--headless", "--listen", "0.0.0.0:6666"]
+CMD ["/home/nvim_user/.local/share/bob/nightly/bin/nvim", "--headless", "--listen", "0.0.0.0:6666"]
 

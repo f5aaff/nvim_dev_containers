@@ -141,7 +141,10 @@ if [[ -z "$(which tar)" ]]; then
 fi
 
 chmod -R ugo+rwx /nvim_deps
-chown -R /nvim_deps nvim_user
+NVIM_UID=$(id -u nvim_user)
+NVIM_GID=$(id -g nvim_user)
+chown -R nvim_user /nvim_deps
+chown -R $NVIM_UID:$NVIM_GID /nvim_deps
 copy_with_progress ./local_share/nvim /home/$TARGET_USER/.local/share/
 printf "\e[32m copied ~/.local/share/nvim \n\e[0m"
 
