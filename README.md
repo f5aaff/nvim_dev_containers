@@ -29,7 +29,7 @@ that can be connected to from the host machine, using built in nvim functionalit
 - The instructions for installing packer can be found on the creators github, [here](https://github.com/wbthomason/packer.nvim)
 
 # creating the docker image
-- run ./package_nvim.sh, you need to include this in your docker container, to be opened and ran from inside.
+- run ./package_nvim.sh, you need to include the output from this in your docker container, to be opened and have the installer ran from inside.
 - use whatever docker image you feel like, and install the following:
     - neovim
     - bash
