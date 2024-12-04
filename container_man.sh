@@ -5,31 +5,26 @@ DEFAULT_ENV_PATH="./container_man.env"
 
 # Function to display help
 function show_help {
-    cat << EOF
+    cat <<EOF
 Usage: $0 [options]
 Options:
   -h, --help          Prints this message
   -b, --build         Builds the container using DOCKER_PATH from .env
   -s, --start         Runs 'docker compose up' on the container under DOCKER_PATH
+      --silent(optional) starts silently as a background process, redirects all output to /dev/null
   -S, --stop          Stops the container located under DOCKER_PATH
   -c, --connect       Connects an nvim instance to the container using CONTAINER_NAME and PORT from .env
-  [path/to/.env]      Optional: Specify the .env file path (default: $DEFAULT_ENV_PATH)
+  \$ENV_PATH provide the path to the env path you wish to use, otherwise $DEFAULT_ENV_PATH will be used.
 EOF
 }
 
-# Parse optional .env path
-if [[ "$1" != -* ]]; then
-    ENV_PATH="$1"
-    shift
-else
-    ENV_PATH="$DEFAULT_ENV_PATH"
-fi
 # Ensure the .env file exists before sourcing
 if [[ -n "$ENV_PATH" && -f "$ENV_PATH" ]]; then
+    echo "using .env: $ENV_PATH"
     source "$ENV_PATH"
 elif [[ -n "$ENV_PATH" ]]; then
-    echo "Environment file not found: $ENV_PATH"
-    exit 1
+    echo "Environment file not found: $ENV_PATH, using default: $DEFAULT_ENV_PATH"
+    ENV_PATH=$DEFAULT_ENV_PATH
 fi
 
 # Parse command-line arguments
@@ -59,7 +54,15 @@ case "$1" in
 -s | --start)
     DOCKER_PATH="${DOCKER_PATH:-./docker}"
     cd "$DOCKER_PATH" || exit
-    docker compose up -d
+
+    case "$2" in
+    --silent)
+        docker compose up -d >/dev/null 2>&1 &
+        ;;
+    *)
+        docker compose up -d
+        ;;
+    esac
     ;;
 -S | --stop)
     DOCKER_PATH="${DOCKER_PATH:-./docker}"

@@ -57,14 +57,17 @@ that can be connected to from the host machine, using built in nvim functionalit
 container_man is a fairly simple bash script, intended to wrap some of the basic functions of dev containers.
 
 ```
-Usage: ./container_man.sh [-b|-s|-S|-c [path/to/.env](optional)]
-     [-h|--help] prints this message
-     [-b|--build] builds the container at the path given by DOCKER_PATH in the .env
-     [-s|--start] runs docker compose up on the container located under DOCKER_PATH
-     [-S|--stop] stops the container located under DOCKER_PATH
-     [-c|--connect] attempts to connect an nvim instance to the given container, provided the details are correct, taken from the .env as CONTAINER_NAME and PORT respectively.
+Usage: ./container_man.sh [options]
+Options:
+  -h, --help          Prints this message
+  -b, --build         Builds the container using DOCKER_PATH from .env
+  -s, --start         Runs 'docker compose up' on the container under DOCKER_PATH
+      --silent(optional) starts silently as a background process, redirects all output to /dev/null
+  -S, --stop          Stops the container located under DOCKER_PATH
+  -c, --connect       Connects an nvim instance to the container using CONTAINER_NAME and PORT from .env
+  $ENV_PATH provide the path to the env path you wish to use, otherwise ./container_man.env will be used.
 ```
-- container_man goes off of the values presented in ./container_man.env. the defaults are listed in the file currently,
+- container_man goes off of the values presented in ./container_man.env, unless ```ENV_PATH``` is provided, then it will use that. the defaults are listed in the file currently,
 but even if those values are removed, the defaults are within the script itself.
 ## build
 - this will run ./package_nvim.sh, packaging up the local neovim configuration, and placing it in the given docker context.
