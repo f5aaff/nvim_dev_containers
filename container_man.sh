@@ -1,78 +1,82 @@
-#!/bin/bash
-ENV_PATH="$1"
-if [ -z $ENV_PATH ];then
-    ENV_PATH=./container_man.env
+##!/bin/bash
+
+# Default .env path
+DEFAULT_ENV_PATH="./container_man.env"
+
+# Function to display help
+function show_help {
+    cat << EOF
+Usage: $0 [options]
+Options:
+  -h, --help          Prints this message
+  -b, --build         Builds the container using DOCKER_PATH from .env
+  -s, --start         Runs 'docker compose up' on the container under DOCKER_PATH
+  -S, --stop          Stops the container located under DOCKER_PATH
+  -c, --connect       Connects an nvim instance to the container using CONTAINER_NAME and PORT from .env
+  [path/to/.env]      Optional: Specify the .env file path (default: $DEFAULT_ENV_PATH)
+EOF
+}
+
+# Parse optional .env path if it's not a flag
+if [[ "$1" != -* ]]; then
+    ENV_PATH="$1"
+    shift
+else
+    ENV_PATH="$DEFAULT_ENV_PATH"
 fi
-source $ENV_PATH
+
+# Ensure the .env file exists before sourcing
+if [[ -f "$ENV_PATH" ]]; then
+    source "$ENV_PATH"
+else
+    echo "Environment file not found: $ENV_PATH"
+    exit 1
+fi
+
+# Parse command-line arguments
 case "$1" in
 -h | --help)
-    echo "Usage: $0 [-b|-s|-S|-c [path/to/.env](optional)]"
-    echo "     [-h|--help] prints this message"
-    echo "     [-b|--build] builds the container at the path given by DOCKER_PATH in the .env"
-    echo "     [-s|--start] runs docker compose up on the container located under DOCKER_PATH"
-    echo "     [-S|--stop] stops the container located under DOCKER_PATH"
-    echo "     [-c|--connect] attempts to connect an nvim instance to the given container, provided the details are correct, taken from the .env as CONTAINER_NAME and PORT respectively."
-    exit 0
+    show_help
     ;;
 -b | --build)
-    if [ "$OFFLINE" = true ]; then
+    # Offline build preparation
+    if [[ "$OFFLINE" == "true" ]]; then
         CMD="./util/getBins.sh"
-
-        if [ -n "$PACKAGES" ]; then
-            CMD="$CMD -i $PACKAGES"
-        fi
-
-        if [ -n "$PACKAGE_OUTPUT" ]; then
-            CMD="$CMD -o $PACKAGE_OUTPUT"
-        fi
-
-        # Execute the command
+        [[ -n "$PACKAGES" ]] && CMD="$CMD -i $PACKAGES"
+        [[ -n "$PACKAGE_OUTPUT" ]] && CMD="$CMD -o $PACKAGE_OUTPUT"
         echo "Executing: $CMD"
         $CMD
     fi
-    CMD="./package_nvim.sh"
-    if [ -n "$DOCKER_PATH" ]; then
-        CMD="$CMD -d $DOCKER_PATH"
-    fi
 
+    # Build the container
+    CMD="./package_nvim.sh"
+    [[ -n "$DOCKER_PATH" ]] && CMD="$CMD -d $DOCKER_PATH"
+    echo "Executing: $CMD"
     $CMD
 
-    cd $DOCKER_PATH
+    [[ -n "$DOCKER_PATH" ]] && cd "$DOCKER_PATH"
     docker compose build
     ;;
 -s | --start)
-    if [ -z "$DOCKER_PATH" ]; then
-        DOCKER_PATH=./docker
-    fi
-    cd $DOCKER_PATH
+    DOCKER_PATH="${DOCKER_PATH:-./docker}"
+    cd "$DOCKER_PATH" || exit
     docker compose up
-    cd -
     ;;
 -S | --stop)
-    if [ -z "$DOCKER_PATH" ]; then
-        DOCKER_PATH=./docker
-    fi
-    cd $DOCKER_PATH
-
+    DOCKER_PATH="${DOCKER_PATH:-./docker}"
+    cd "$DOCKER_PATH" || exit
     docker compose down
-
-    cd -
     ;;
 -c | --connect)
-    if [[ -z "$CONTAINER_NAME" ]]; then
-        CONTAINER_NAME="neovim_headless"
-    fi
-
-    if [[ -z "$PORT" ]]; then
-        PORT=6666
-    fi
-    printf "\e[32m using $CONTAINER_NAME as the server with port $PORT...\n\e[0m"
-    SERVER=$(docker exec $CONTAINER_NAME hostname -i)
-    nvim --server $SERVER:$PORT --remote-ui
+    CONTAINER_NAME="${CONTAINER_NAME:-neovim_headless}"
+    PORT="${PORT:-6666}"
+    echo -e "\e[32mUsing $CONTAINER_NAME as the server with port $PORT...\e[0m"
+    SERVER=$(docker exec "$CONTAINER_NAME" hostname -i)
+    nvim --server "$SERVER:$PORT" --remote-ui
     ;;
 *)
     echo "Invalid argument: $1" >&2
-    $0 --help
+    show_help
     exit 1
     ;;
 esac
