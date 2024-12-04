@@ -1,2 +1,3 @@
 *.tar
-docker/bins
+**/bins
+docker/bins/

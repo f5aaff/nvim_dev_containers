@@ -17,18 +17,17 @@ Options:
 EOF
 }
 
-# Parse optional .env path if it's not a flag
+# Parse optional .env path
 if [[ "$1" != -* ]]; then
     ENV_PATH="$1"
     shift
 else
     ENV_PATH="$DEFAULT_ENV_PATH"
 fi
-
 # Ensure the .env file exists before sourcing
-if [[ -f "$ENV_PATH" ]]; then
+if [[ -n "$ENV_PATH" && -f "$ENV_PATH" ]]; then
     source "$ENV_PATH"
-else
+elif [[ -n "$ENV_PATH" ]]; then
     echo "Environment file not found: $ENV_PATH"
     exit 1
 fi
@@ -60,7 +59,7 @@ case "$1" in
 -s | --start)
     DOCKER_PATH="${DOCKER_PATH:-./docker}"
     cd "$DOCKER_PATH" || exit
-    docker compose up
+    docker compose up -d
     ;;
 -S | --stop)
     DOCKER_PATH="${DOCKER_PATH:-./docker}"
