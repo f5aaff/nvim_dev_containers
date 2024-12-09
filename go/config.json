@@ -1,0 +1,9 @@
+{
+    "DOCKER_PATH":"../docker/",
+    "IMAGE": "alpine:latest",
+    "CONTAINER_NAME":"neovim_headless",
+    "PORT": "6666",
+    "OFFLINE": false,
+    "PACKAGES": "curl,whoami,pv,git",
+    "PACKAGE_OUTPUT":"../docker/bins"
+}
